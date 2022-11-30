@@ -1,8 +1,10 @@
 /*
- * function.c
+ ******************************************************************************
+ * \file function.c
  *
- *  Created on: Nov 30, 2022
+ * \@Note Created on: Nov 30, 2022
  *      Author: quentinrolland
+ ******************************************************************************
  */
 
 
@@ -10,12 +12,12 @@
 #include "Const.h"
 #include "math.h"
 
-
- /**
-  * \fn Init(I2C_HandleTypeDef* p_hi2c1)
-  * \brief Cette fonction met à 1 le bit 7 de PWR_MGMT_1 pour faire un reset de l'ensemble des registres du capteur, puis attend
+/**
+ 	 * @brief Init I2C1
+ 	 * @Note Cette fonction met à 1 le bit 7 de PWR_MGMT_1 pour faire un reset de l'ensemble des registres du capteur, puis attend
 	 * 100ms et choisit une horlorge
-	 * \param p_hi2c1
+	 * @param p_hi2c1 Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier
+	 * @retval None
 	 */
 void Init(I2C_HandleTypeDef* p_hi2c1)
 {
@@ -55,10 +57,11 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 
 
 /**
- * \fn Measure_T(I2C_HandleTypeDef*,double*)
- * \brief Cette fonction permet de lire la temperature du capteur puis de l'enregistrer dans une variable globale de type double
-	 * \param p_hi2c1
-	 * un pointeur vers une vaiable Temperature de type double dans laquelle on stocke la valeur obtenu
+ 	 * @brief Mesure temperature
+ 	 * @Note Cette fonction permet de lire la temperature du capteur puis de l'enregistrer dans une variable globale de type double
+	 * @param p_hi2c1 Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier.
+	 * @param Temperature Pointeur vers une zone mémoire de type double contenant l’information de température
+	 * @retval None
 	 */
 
 void Measure_T(I2C_HandleTypeDef* p_hi2c1, double* Temperature)
@@ -74,6 +77,33 @@ void Measure_T(I2C_HandleTypeDef* p_hi2c1, double* Temperature)
 
 }
 
+
+/**
+ 	 * @brief Mesure acceleration
+ 	 * @Note Cette fonction permet de lire l'acceleration du capteur sur les axes x,y et z puis de l'enregistrer dans une variable globale de type double
+	 * @param p_hi2c1 Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier
+	 * @param Acceleration Pointeur vers une zone mémoire de type double contenant l’information de température
+	 * @retval None
+	 */
+
+void Measure_A(I2C_HandleTypeDef* p_hi2c1,double* Acceleration){
+	uint8_t buff[6];
+	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, ACCEL_XOUT_H, 1, &buff[0], 6, 10);
+
+
+	uint16_t ax = 0;
+		ax = ((buff[0]<< 8) + buff[1]);
+
+	uint16_t ay = 0;
+		ay = ((buff[2]<< 8) + buff[3]);
+
+	uint16_t az = 0;
+		az = ((buff[4]<< 8) + buff[5]);
+
+	Acceleration[0] = ax*9.81*2/32767.0;
+	Acceleration[1] = ay*9.81*2/32767.0;
+	Acceleration[2] = az*9.81*2/32767.0;
+}
 
 
 

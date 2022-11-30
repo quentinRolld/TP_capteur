@@ -1,7 +1,7 @@
 /*
- * Const.h
+ * \@brief Const.h
  *
- *  Created on: 21 nov. 2022
+ * \@Note Created on: 21 nov. 2022
  *      Author: quentinrolland
  */
 
