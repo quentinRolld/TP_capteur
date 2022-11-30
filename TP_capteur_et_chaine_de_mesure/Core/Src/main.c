@@ -112,16 +112,16 @@ int main(void)
   HAL_I2C_Master_Transmit(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY);
   HAL_I2C_Master_Receive(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY);
 
-  printf("%x \r\n", pData[0]);
+  printf(" L'identifiant du capteur est : %x \r\n", pData[0]);
 
-  for (i=0;i<256;i++){
+  for (i=0;i<246;i++){
        	  if(HAL_I2C_IsDeviceReady(&hi2c1, i, 4, 20)==HAL_OK){
        		  Devices[x]=i;
        		  printf("%d \r\n",Devices[x]);
        		  x=x+1;
        	  }
        	  else{
-       		  printf("probleme \r\n");
+       		  //printf("probleme \r\n");
        	  }
          }
 
