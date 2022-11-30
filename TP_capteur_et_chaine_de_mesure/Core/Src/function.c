@@ -64,11 +64,11 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 	 * @retval None
 	 */
 
-void Measure_T(I2C_HandleTypeDef* p_hi2c1, double* Temperature)
+void Measure_T(I2C_HandleTypeDef* hi2cx, double* Temperature)
 {
 	uint8_t buff[6];
-	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, TEMP_OUT_H, 1, &buff[0], 1, 10);
-	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, TEMP_OUT_L, 1, &buff[1], 1, 10);
+	HAL_I2C_Mem_Read ( hi2cx, MPU_ADD, TEMP_OUT_H, 1, &buff[0], 1, 10);
+	HAL_I2C_Mem_Read ( hi2cx, MPU_ADD, TEMP_OUT_L, 1, &buff[1], 1, 10);
 
 	uint16_t Temp = 0;
 	Temp = ((buff[0]<< 8) + buff[1]);
@@ -86,9 +86,9 @@ void Measure_T(I2C_HandleTypeDef* p_hi2c1, double* Temperature)
 	 * @retval None
 	 */
 
-void Measure_A(I2C_HandleTypeDef* p_hi2c1,double* Acceleration){
+void Measure_A(I2C_HandleTypeDef* hi2cx,double* Acceleration){
 	uint8_t buff[6];
-	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, ACCEL_XOUT_H, 1, &buff[0], 6, 10);
+	HAL_I2C_Mem_Read ( hi2cx, MPU_ADD, ACCEL_XOUT_H, 1, &buff[0], 6, 10);
 
 
 	uint16_t ax = 0;
@@ -106,7 +106,52 @@ void Measure_A(I2C_HandleTypeDef* p_hi2c1,double* Acceleration){
 }
 
 
+void Measure_Vitesse_angulaire(I2C_HandleTypeDef* hi2cx, double* tableau_donnee_utiles)
+{
+	uint8_t buffer[6];
+	uint8_t plage[1];
+	uint16_t gyro_x;
+	uint16_t gyro_y;
+	uint16_t gyro_z;
+	int p = 0;
 
+	if( HAL_I2C_Mem_Read( hi2cx, MPU_ADD, GYRO_XOUT_H, 1, &buffer[0], 6, 10) != HAL_OK){
+		printf("probleme lecture donnees gyro \r\n");
+		Error_Handler();
+	}
+
+	if( HAL_I2C_Mem_Read( hi2cx, MPU_ADD, GYRO_CONFIG, 1, &plage[0], 1, 10) != HAL_OK){
+		printf("probleme lecture plage echelle gyro \r\n");
+		Error_Handler();
+	}
+
+	plage[0] = ((plage[0])&(0b11000))>>3;
+
+                if(plage[0]==00)
+		{
+                    p =250;
+                }
+                else if(plage[0]==10)
+		{
+                    p =500;
+                }
+                else if(plage[0]==01)
+		{
+                    p =1000;
+                }
+                else {
+                    p =2000;
+                }
+
+
+	gyro_x = (uint16_t)((buffer[0]<<8) + buffer[1]);
+	gyro_y = (uint16_t)((buffer[2]<<8) + buffer[3]);
+	gyro_z = (uint16_t)((buffer[4]<<8) + buffer[5]);
+
+	tableau_donnee_utiles[0] =  gyro_x * p / 32767.0;
+	tableau_donnee_utiles[1] =  gyro_y * p / 32767.0;
+	tableau_donnee_utiles[2] =  gyro_z * p / 32767.0;
+}
 
 
 
