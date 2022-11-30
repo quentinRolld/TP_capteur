@@ -24,6 +24,7 @@
 #include "Const.h"
 #include "stdio.h"
 #include <math.h>
+#include "function.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,6 +49,7 @@ UART_HandleTypeDef hlpuart1;
 /* USER CODE BEGIN PV */
 
 char mess1[30];
+double Temperature = 0;
 
 /* USER CODE END PV */
 
@@ -109,20 +111,32 @@ int main(void)
  uint8_t pData[100] = {0};
 
  pData[0]=0x75;
-  HAL_I2C_Master_Transmit(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY);
-  HAL_I2C_Master_Receive(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY);
+  if(HAL_I2C_Master_Transmit(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY) != HAL_OK )
+  {
+	  printf("il y a une erreur avec I2C Master Transmit \r\n");
+  }
+  if(HAL_I2C_Master_Receive(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY) != HAL_OK )
+  {
+	  printf("il y a une erreur avec I2C Master Receive \r\n");
+  }
+
 
   printf(" L'identifiant du capteur est : %x \r\n", pData[0]);
+  if((pData[0] =! 0x71))
+  {
+	  printf("ce n'est pas le bon capteur \r\n");
+  }
+  else
+	  printf("MPU-9250 identified \r\n");
 
-  for (i=0;i<246;i++){
+
+  for (i=0;i<256;i++){
        	  if(HAL_I2C_IsDeviceReady(&hi2c1, i, 4, 20)==HAL_OK){
        		  Devices[x]=i;
        		  printf("%d \r\n",Devices[x]);
        		  x=x+1;
        	  }
-       	  else{
-       		  //printf("probleme \r\n");
-       	  }
+
          }
 
   /* USER CODE END 2 */
@@ -133,6 +147,10 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+	  Measure_T(&hi2c1, &Temperature);
+	  printf("Temperature = %d C \r\n", (int)(Temperature));
+
+	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
