@@ -206,17 +206,6 @@ void Measure_M(I2C_HandleTypeDef* p_hi2c1,double* mag){
 						mag[1] = (y*((((asay-128)*0.5)/128)+1)*4912)/32760;
 						mag[2] = (z*((((asaz-128)*0.5)/128)+1)*4912)/32760;
 			}
-
-
-
-
-
-
 		}
-
-
-
-
-
 }
 
