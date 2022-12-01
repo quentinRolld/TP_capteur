@@ -54,6 +54,7 @@ double Acceleration[3] = {0};
 double norme_vecteur_gravite = 0;
 double donnees_Gyrometre[3] ={0};
 double norme_vecteur_Gyrometre =0;
+double donnees_mag[3]={0};
 
 
 /* USER CODE END PV */
@@ -117,7 +118,13 @@ int main(void)
 
  uint8_t pData[100] = {0};
 
- pData[0]=0x75;
+ // Initialisation du capteur
+
+ Init(&hi2c1);
+
+ // vérification identité capteur MPU-9250
+
+ pData[0]= WHO_AM_I_MPU9250;
   if(HAL_I2C_Master_Transmit(&hi2c1, MPU_ADD, pData, 1, HAL_MAX_DELAY) != HAL_OK )
   {
 	  printf("il y a une erreur avec I2C Master Transmit \r\n");
@@ -136,6 +143,30 @@ int main(void)
   else
 	  printf("MPU-9250 identified \r\n");
 
+  // vérification identité AK8963C (magnétomètre)
+
+  pData[0]= WHO_AM_I_AK8963;
+    if(HAL_I2C_Master_Transmit(&hi2c1, MAGNETO_ADD, pData, 1, HAL_MAX_DELAY) != HAL_OK )
+    {
+  	  printf("il y a une erreur avec I2C Master Transmit \r\n");
+    }
+    if(HAL_I2C_Master_Receive(&hi2c1, MAGNETO_ADD, pData, 1, HAL_MAX_DELAY) != HAL_OK )
+    {
+  	  printf("il y a une erreur avec I2C Master Receive \r\n");
+    }
+
+
+    printf(" L'identifiant du magnétomètre est : %x \r\n", pData[0]);
+    if((pData[0] =! 0x48))
+    {
+  	  printf("ce n'est pas le bon capteur \r\n  ****** \r\n ****** \r\n ****** \r\n");
+    }
+    else
+  	  printf("AK8963C identified \r\n  ****** \r\n ****** \r\n ****** \r\n");
+
+
+
+// check les périphériques i2c disponibles
 
   for (i=0;i<256;i++){
        	  if(HAL_I2C_IsDeviceReady(&hi2c1, i, 4, 20)==HAL_OK){
@@ -157,26 +188,41 @@ int main(void)
 	  Measure_T(&hi2c1, &Temperature);
 	  printf("Temperature = %.2f C \r\n", Temperature);
 
-	  HAL_Delay(1000);
+	  HAL_Delay(2000);
 
 	  Measure_A(&hi2c1, Acceleration);
 	  printf("Acceleration selon x = %.4f m/s2 \r\n", Acceleration[0]);
 	  HAL_Delay(100);
 	  printf("Acceleration selon y = %.4f m/s2 \r\n", Acceleration[1]);
 	  HAL_Delay(100);
-	  printf("Acceleration selon z = %.4f m/s2 \r\n", Acceleration[2]);
+	  printf("Acceleration selon z = %.4f m/s2 \r\n ****** \r\n", Acceleration[2]);
 	  HAL_Delay(100);
 	  norme_vecteur_gravite = sqrt(Acceleration[0]/9.81*Acceleration[0]/9.81+Acceleration[1]/9.81*Acceleration[1]/9.81+Acceleration[2]/9.81*Acceleration[2]/9.81);
-	  printf("norme du vecteur gravite = %.4f \r\n", norme_vecteur_gravite);
-	  HAL_Delay(1000);
+	  printf("norme du vecteur gravite = %.4f \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_gravite);
+	  HAL_Delay(2000);
 
 	  Measure_Vitesse_angulaire(&hi2c1, donnees_Gyrometre);
 	  printf("Vitesse angulaire selon x = %.4f deg/sec \r\n", donnees_Gyrometre[0]);
 	  printf("Vitesse angulaire selon y = %.4f deg/sec \r\n", donnees_Gyrometre[1]);
-	  printf("Vitesse angulaire selon z = %.4f deg/sec \r\n", donnees_Gyrometre[2]);
+	  printf("Vitesse angulaire selon z = %.4f deg/sec \r\n ****** \r\n", donnees_Gyrometre[2]);
 
 	  norme_vecteur_Gyrometre = sqrt(donnees_Gyrometre[0]*donnees_Gyrometre[0]+donnees_Gyrometre[1]*donnees_Gyrometre[1]+donnees_Gyrometre[2]*donnees_Gyrometre[2]);
-	  printf("norme du vecteur rotation = %.4f deg/sec \r\n", norme_vecteur_Gyrometre);
+	  printf("norme du vecteur rotation = %.4f deg/sec \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_Gyrometre);
+
+	  HAL_Delay(2000);
+
+	  Measure_M(&hi2c1, donnees_mag);
+	  printf("champ magnetique selon x = %.4f µT \r\n", donnees_mag[0]);
+	  printf("champ magnetique selon y = %.4f µT \r\n", donnees_mag[1]);
+	  printf("champ magnetique selon z = %.4f µT \r\n ****** \r\n", donnees_mag[2]);
+
+	  double norme_vecteur_mag = sqrt(donnees_mag[0]*donnees_mag[0]+donnees_mag[1]*donnees_mag[1]+donnees_mag[2]*donnees_mag[2]);
+	  printf("norme du vecteur champ magnetique = %.4f µT \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_mag);
+
+	  HAL_Delay(2000);
+
+
+
 
     /* USER CODE BEGIN 3 */
   }
