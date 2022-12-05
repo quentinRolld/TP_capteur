@@ -32,8 +32,21 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 	HAL_I2C_Mem_Write ( p_hi2c1, MPU_ADD, PWR_MGMT_1,  1, &buff[0], 1, 10);
 
 
-	buff[0] =0x00;  // changement de la sensibilité de l'accélérometre  00=2g 10=4g 01=8g 11=16g
-		HAL_I2C_Mem_Write ( p_hi2c1, MPU_ADD,  ACCEL_CONFIG,  1, &buff[0], 1, 10);
+	// changement de la sensibilité de l'accélérometre  00=2g 01=4g 10=8g 11=16g
+	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  ACCEL_CONFIG,  1, &buff[0], 1, 10);
+
+	//Pour mettre 00
+	buff[0] =(buff[0] & (0b11100111)) ;
+	//Pour mettre 01
+	//buff[0] =(buff[0] & (0b11101111)) ;
+	//buff[0] =(buff[0] | (0b00001000)) ;
+	//Pour mettre 10
+	//buff[0] =(buff[0] & (0b11110111)) ;
+	//buff[0] =(buff[0] | (0b00010000)) ;
+	//Pour mettre 11
+	//buff[0] =(buff[0] | (0b00011000)) ;
+
+	HAL_I2C_Mem_Write ( p_hi2c1, MPU_ADD,  ACCEL_CONFIG,  1, &buff[0], 1, 10);
 
 
 	buff[0]=0x2; // Bypass pour activer le magnétomètre
@@ -93,6 +106,9 @@ void Measure_A(I2C_HandleTypeDef* hi2cx,double* Acceleration){
 	uint8_t buff[6];
 	HAL_I2C_Mem_Read ( hi2cx, MPU_ADD, ACCEL_XOUT_H, 1, &buff[0], 6, 10);
 
+	uint8_t buffer_scale[1];
+	HAL_I2C_Mem_Read ( hi2cx, MPU_ADD,  ACCEL_CONFIG,  1, &buffer_scale[0], 1, 10);
+
 
 	uint16_t ax = 0;
 		ax = ((buff[0]<< 8) + buff[1]);
@@ -103,9 +119,29 @@ void Measure_A(I2C_HandleTypeDef* hi2cx,double* Acceleration){
 	uint16_t az = 0;
 		az = ((buff[4]<< 8) + buff[5]);
 
-	Acceleration[0] = ax*9.81*2/32767.0;
-	Acceleration[1] = ay*9.81*2/32767.0;
-	Acceleration[2] = az*9.81*2/32767.0;
+		//Check de la sensibilité
+
+	buffer_scale[0] = ((buffer_scale[0])&(0b11000))>>3;
+	int sensibility =0;
+
+	if (buffer_scale[0]==00){
+		sensibility=2;
+	}
+	else if (buffer_scale[0]==01){
+		sensibility=4;
+	}
+	else if (buffer_scale[0]==10){
+		sensibility=8;
+	}
+	else if (buffer_scale[0]==11){
+		sensibility=16;
+	}
+
+	Acceleration[0] = ax*9.81*sensibility/32767.0;
+	Acceleration[1] = ay*9.81*sensibility/32767.0;
+	Acceleration[2] = az*9.81*sensibility/32767.0;
+
+
 }
 
 /**
