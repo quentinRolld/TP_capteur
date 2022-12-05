@@ -64,11 +64,14 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 		Error_Handler();
 
 	}
+	*/
 	buff[0]=0xFF; // réglage de la fréquence d'échantillonnage
-	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,SMPLRT_DIV,1,buff,1,10)!=HAL_OK){
+	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,SMPLRT_DIV,1,buff[0],1,10)!=HAL_OK){
 		Error_Handler();
 	}
-	*/
+	HAL_I2C_Mem_Read(p_hi2c1,MPU_ADD,LP_ACCEL_ODR,1,buff[0],1,10);
+	// a faire : changer la valeur de DLPF_CFG à 2 par exemple et voir en mode debug si la valeur des 4 derniers bits de LP_ACCEL_ODR est à 4.
+
 }
 
 
