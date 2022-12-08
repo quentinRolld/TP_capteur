@@ -55,7 +55,7 @@ double norme_vecteur_gravite = 0;
 double donnees_Gyrometre[3] ={0};
 double norme_vecteur_Gyrometre =0;
 double donnees_mag[3]={0};
-
+double noise[3] = {0};
 
 /* USER CODE END PV */
 
@@ -185,46 +185,56 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-	  Measure_T(&hi2c1, &Temperature);
-	  printf("Temperature = %.2f C \r\n", Temperature);
-
-	  HAL_Delay(2000);
-
-	  Measure_A(&hi2c1, Acceleration);
-	  printf("Acceleration selon x = %.4f m/s2 \r\n", Acceleration[0]);
-	  HAL_Delay(100);
-	  printf("Acceleration selon y = %.4f m/s2 \r\n", Acceleration[1]);
-	  HAL_Delay(100);
-	  printf("Acceleration selon z = %.4f m/s2 \r\n ****** \r\n", Acceleration[2]);
-	  HAL_Delay(100);
-	  norme_vecteur_gravite = sqrt(Acceleration[0]/9.81*Acceleration[0]/9.81+Acceleration[1]/9.81*Acceleration[1]/9.81+Acceleration[2]/9.81*Acceleration[2]/9.81);
-	  printf("norme du vecteur gravite = %.4f \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_gravite);
-	  HAL_Delay(2000);
-
-	  Measure_Vitesse_angulaire(&hi2c1, donnees_Gyrometre);
-	  printf("Vitesse angulaire selon x = %.4f deg/sec \r\n", donnees_Gyrometre[0]);
-	  printf("Vitesse angulaire selon y = %.4f deg/sec \r\n", donnees_Gyrometre[1]);
-	  printf("Vitesse angulaire selon z = %.4f deg/sec \r\n ****** \r\n", donnees_Gyrometre[2]);
-
-	  norme_vecteur_Gyrometre = sqrt(donnees_Gyrometre[0]*donnees_Gyrometre[0]+donnees_Gyrometre[1]*donnees_Gyrometre[1]+donnees_Gyrometre[2]*donnees_Gyrometre[2]);
-	  printf("norme du vecteur rotation = %.4f deg/sec \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_Gyrometre);
-
-	  HAL_Delay(2000);
-
-	  Measure_M(&hi2c1, donnees_mag);
-	  printf("champ magnetique selon x = %.4f µT \r\n", donnees_mag[0]);
-	  printf("champ magnetique selon y = %.4f µT \r\n", donnees_mag[1]);
-	  printf("champ magnetique selon z = %.4f µT \r\n ****** \r\n", donnees_mag[2]);
-
-	  double norme_vecteur_mag = sqrt(donnees_mag[0]*donnees_mag[0]+donnees_mag[1]*donnees_mag[1]+donnees_mag[2]*donnees_mag[2]);
-	  printf("norme du vecteur champ magnetique = %.4f µT \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_mag);
-
-	  HAL_Delay(2000);
-
-
-
-
     /* USER CODE BEGIN 3 */
+
+/*
+	  Measure_T(&hi2c1, &Temperature);
+	 	  printf("Temperature = %.2f C \r\n", Temperature);
+
+	 	  HAL_Delay(2000);
+
+	 	  Measure_A(&hi2c1, Acceleration);
+	 	  printf("Acceleration selon x = %.4f m/s2 \r\n", Acceleration[0]);
+	 	  HAL_Delay(100);
+	 	  printf("Acceleration selon y = %.4f m/s2 \r\n", Acceleration[1]);
+	 	  HAL_Delay(100);
+	 	  printf("Acceleration selon z = %.4f m/s2 \r\n ****** \r\n", Acceleration[2]);
+	 	  HAL_Delay(100);
+	 	  norme_vecteur_gravite = sqrt(Acceleration[0]/9.81*Acceleration[0]/9.81+Acceleration[1]/9.81*Acceleration[1]/9.81+Acceleration[2]/9.81*Acceleration[2]/9.81);
+	 	  printf("norme du vecteur gravite = %.4f \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_gravite);
+	 	  HAL_Delay(2000);
+
+	 	  Measure_Vitesse_angulaire(&hi2c1, donnees_Gyrometre);
+	 	  printf("Vitesse angulaire selon x = %.4f deg/sec \r\n", donnees_Gyrometre[0]);
+	 	  printf("Vitesse angulaire selon y = %.4f deg/sec \r\n", donnees_Gyrometre[1]);
+	 	  printf("Vitesse angulaire selon z = %.4f deg/sec \r\n ****** \r\n", donnees_Gyrometre[2]);
+
+	 	  norme_vecteur_Gyrometre = sqrt(donnees_Gyrometre[0]*donnees_Gyrometre[0]+donnees_Gyrometre[1]*donnees_Gyrometre[1]+donnees_Gyrometre[2]*donnees_Gyrometre[2]);
+	 	  printf("norme du vecteur rotation = %.4f deg/sec \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_Gyrometre);
+*/
+	 	  HAL_Delay(200);
+
+	 	  Noise_G(&hi2c1, noise);
+	 	  printf("Veff bruit selon x = %.4f deg/sec \r\n", noise[0]);
+	 	  printf("Veff bruit selon y = %.4f deg/sec \r\n", noise[1]);
+	 	  printf("Veff bruit selon z = %.4f deg/sec \r\n ****** \r\n", noise[2]);
+
+	 	  HAL_Delay(2000);
+
+/*
+	 	  Measure_M(&hi2c1, donnees_mag);
+	 	  printf("champ magnetique selon x = %.4f µT \r\n", donnees_mag[0]);
+	 	  printf("champ magnetique selon y = %.4f µT \r\n", donnees_mag[1]);
+	 	  printf("champ magnetique selon z = %.4f µT \r\n ****** \r\n", donnees_mag[2]);
+
+	 	  double norme_vecteur_mag = sqrt(donnees_mag[0]*donnees_mag[0]+donnees_mag[1]*donnees_mag[1]+donnees_mag[2]*donnees_mag[2]);
+	 	  printf("norme du vecteur champ magnetique = %.4f µT \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_mag);
+
+	 	  HAL_Delay(2000);
+*/
+
+
+
   }
   /* USER CODE END 3 */
 }

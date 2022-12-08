@@ -32,7 +32,7 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 	HAL_I2C_Mem_Write ( p_hi2c1, MPU_ADD, PWR_MGMT_1,  1, &buff[0], 1, 10);
 
 
-	// changement de la sensibilité de l'accélérometre  00=2g 01=4g 10=8g 11=16g
+	/********* changement de la sensibilité de l'accélérometre  00=2g 01=4g 10=8g 11=16g *********/
 	HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  ACCEL_CONFIG,  1, &buff[0], 1, 10);
 
 	//Pour mettre 00
@@ -58,18 +58,91 @@ void Init(I2C_HandleTypeDef* p_hi2c1)
 		 	  	  Error_Handler();
 
 		 	  }
-	/*
-	buff[0]=0x3; // réglage de la bande passante
-	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,buff,1,10)!=HAL_OK){
-		Error_Handler();
 
-	}
-	*/
-	buff[0]=0xFF; // réglage de la fréquence d'échantillonnage
-	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,SMPLRT_DIV,1,buff[0],1,10)!=HAL_OK){
+	/********** Réglage de la bande passante **********/
+
+	buff[0]=0x3;
+	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,&buff[0],1,10)!=HAL_OK){
 		Error_Handler();
 	}
-	HAL_I2C_Mem_Read(p_hi2c1,MPU_ADD,LP_ACCEL_ODR,1,buff[0],1,10);
+
+/*
+	// bande passante à 3600Hz : FCHOICE = 01 => FCHOICE_b = 10, DLPF_CFG = x
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  GYRO_CONFIG,  1, &buff[0], 1, 10);
+		//Pour mettre 10 dans FCHOICE_b
+		buff[0] =(buff[0] & (0b11111110)) ;
+		buff[0] =(buff[0] | (0b00000010)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,GYRO_CONFIG,1,&buff[0],1,10)!=HAL_OK){
+			Error_Handler();
+		}
+*/
+
+	// bande passante à 250Hz : FCHOICE = 11 => FCHOICE_b = 00, DLPF_CFG = 000
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  GYRO_CONFIG,  1, &buff[0], 1, 10);
+		//Pour mettre 00 dans FCHOICE_b
+		buff[0] =(buff[0] & (0b11111100)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,GYRO_CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler(); }
+		//Pour mettre 000 dans DLPF_CFG
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, CONFIG,  1, &buff[0], 1, 10);
+		buff[0] =(buff[0] & (0b11111000)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler();
+		}
+
+/*
+	// bande passante à 92Hz : FCHOICE = 11 => FCHOICE_b = 00, DLPF_CFG = 010
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  GYRO_CONFIG,  1, &buff[0], 1, 10);
+		//Pour mettre 00 dans FCHOICE_b
+		buff[0] =(buff[0] & (0b11111100)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,GYRO_CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler(); }
+		//Pour mettre 010 dans DLPF_CFG
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, CONFIG, 1, &buff[0], 1, 10);
+		buff[0] =(buff[0] & (0b11111010)) ;
+		buff[0] =(buff[0] | (0b00000010)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler();
+		}
+*/
+/*
+	// bande passante à 20Hz : FCHOICE = 11 => FCHOICE_b = 00, DLPF_CFG = 100
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  GYRO_CONFIG,  1, &buff[0], 1, 10);
+		//Pour mettre 00 dans FCHOICE_b
+		buff[0] =(buff[0] & (0b11111100)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,GYRO_CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler(); }
+		//Pour mettre 110 dans DLPF_CFG
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, CONFIG,  1, &buff[0], 1, 10);
+		buff[0] =(buff[0] & (0b11111100)) ;
+		buff[0] =(buff[0] | (0b00000100)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler();
+		}
+*/
+/*
+	// bande passante à 5Hz : FCHOICE = 11 => FCHOICE_b = 00, DLPF_CFG = 110
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD,  GYRO_CONFIG,  1, &buff[0], 1, 10);
+		//Pour mettre 00 dans FCHOICE_b
+		buff[0] =(buff[0] & (0b11111100)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,GYRO_CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler(); }
+		//Pour mettre 000 dans DLPF_CFG
+		HAL_I2C_Mem_Read ( p_hi2c1, MPU_ADD, CONFIG,  1, &buff[0], 1, 10);
+		buff[0] =(buff[0] & (0b11111110)) ;
+		buff[0] =(buff[0] | (0b00000110)) ;
+		if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,CONFIG,1,&buff[0],1,10)!=HAL_OK){
+				Error_Handler();
+		}
+*/
+
+	/*********** Réglage de la fréquence d'échantillonnage **********/
+
+	buff[0]=0xFF;
+	if(HAL_I2C_Mem_Write(p_hi2c1,MPU_ADD,SMPLRT_DIV,1,&buff[0],1,10)!=HAL_OK){
+		Error_Handler();
+	}
+	HAL_I2C_Mem_Read(p_hi2c1,MPU_ADD,LP_ACCEL_ODR,1,&buff[0],1,10);
 	// a faire : changer la valeur de DLPF_CFG à 2 par exemple et voir en mode debug si la valeur des 4 derniers bits de LP_ACCEL_ODR est à 4.
 
 }
@@ -247,4 +320,43 @@ void Measure_M(I2C_HandleTypeDef* p_hi2c1,double* mag){
 			}
 		}
 }
+
+
+void Noise_G(I2C_HandleTypeDef* hi2cx,double* noise){
+
+		double x_m;
+		double y_m;
+		double z_m;
+		double x_b;
+		double y_b;
+		double z_b;
+		int i =0;
+		double Buffer_gyrometre[3];
+		int Plage_mesure=100;
+
+		for(i=0;i<Plage_mesure;i++){
+
+                Measure_Vitesse_angulaire(hi2cx, Buffer_gyrometre);  //	         N
+				x_m += Buffer_gyrometre[0]/Plage_mesure;//  		  xm = 1/N * ∑ x
+				y_m += Buffer_gyrometre[1]/Plage_mesure;//	      			    i=0
+				z_m += Buffer_gyrometre[2]/Plage_mesure;// moyenne des valeurs
+
+		}
+											//			   N
+		for(i=0;i<Plage_mesure;i++){        //  xb = 1/N * ∑ (x-xm)^2
+											//			  i=0
+			Measure_Vitesse_angulaire(hi2cx, Buffer_gyrometre);		//  = (valeur efficace du bruit)^2
+			x_b += ((Buffer_gyrometre[0]-x_m)*(Buffer_gyrometre[0]-x_m))/Plage_mesure;
+			y_b += ((Buffer_gyrometre[1]-y_m)*(Buffer_gyrometre[1]-y_m))/Plage_mesure;
+			z_b += ((Buffer_gyrometre[2]-z_m)*(Buffer_gyrometre[2]-z_m))/Plage_mesure;
+
+		}
+
+		noise[0] = sqrt(x_b); // Valeur efficace du bruit
+		noise[1] = sqrt(y_b);
+		noise[2] = sqrt(z_b);
+
+}
+
+
 
