@@ -17,5 +17,7 @@ void Measure_A(I2C_HandleTypeDef* hi2cx, double* Acceleration);
 void Measure_Vitesse_angulaire(I2C_HandleTypeDef* hi2cx, double* tableau_donnee_utiles);
 void Measure_M(I2C_HandleTypeDef* p_hi2c1,double* mag);
 void Noise_G(I2C_HandleTypeDef* hi2cx,double* noise);
+void Calib_gyro(I2C_HandleTypeDef* hi2cx,double* gyro_offset);
+void Average(I2C_HandleTypeDef* hi2cx, double* tableau_moyenne);
 
 #endif /* INC_FUNCTION_H_ */

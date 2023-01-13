@@ -56,6 +56,7 @@ double donnees_Gyrometre[3] ={0};
 double norme_vecteur_Gyrometre =0;
 double donnees_mag[3]={0};
 double noise[3] = {0};
+double tableau_moyenne[3]={0};
 
 /* USER CODE END PV */
 
@@ -212,7 +213,7 @@ int main(void)
 	 	  norme_vecteur_Gyrometre = sqrt(donnees_Gyrometre[0]*donnees_Gyrometre[0]+donnees_Gyrometre[1]*donnees_Gyrometre[1]+donnees_Gyrometre[2]*donnees_Gyrometre[2]);
 	 	  printf("norme du vecteur rotation = %.4f deg/sec \r\n ****** \r\n ****** \r\n ****** \r\n", norme_vecteur_Gyrometre);
 */
-	 	  HAL_Delay(200);
+/*	 	  HAL_Delay(200);
 
 	 	  Noise_G(&hi2c1, noise);
 	 	  printf("Veff bruit selon x = %.4f deg/sec \r\n", noise[0]);
@@ -220,7 +221,7 @@ int main(void)
 	 	  printf("Veff bruit selon z = %.4f deg/sec \r\n ****** \r\n", noise[2]);
 
 	 	  HAL_Delay(2000);
-
+*/
 /*
 	 	  Measure_M(&hi2c1, donnees_mag);
 	 	  printf("champ magnetique selon x = %.4f µT \r\n", donnees_mag[0]);
@@ -233,6 +234,11 @@ int main(void)
 	 	  HAL_Delay(2000);
 */
 
+
+	  	  Average(&hi2c1, tableau_moyenne);
+	  	  printf("valeur moyenne de wx calibré et immobile : wx = %.4f \r\n", tableau_moyenne[0]);
+	  	  printf("valeur moyenne de wy calibré et immobile : wy = %.4f \r\n", tableau_moyenne[1]);
+	  	  printf("valeur moyenne de wz calibré et immobile : wz = %.4f \r\n ******* \r\n", tableau_moyenne[2]);
 
 
   }

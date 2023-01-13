@@ -13,6 +13,8 @@
 #include "math.h"
 #include <stdio.h>
 
+
+
 /**
  	 * @brief Init I2C1
  	 * @Note Cette fonction met à 1 le bit 7 de PWR_MGMT_1 pour faire un reset de l'ensemble des registres du capteur, puis attend
@@ -321,8 +323,14 @@ void Measure_M(I2C_HandleTypeDef* p_hi2c1,double* mag){
 		}
 }
 
-
-void Noise_G(I2C_HandleTypeDef* hi2cx,double* noise){
+/**
+ 	 * @brief Mesure de la valeur efficace du bruit
+ 	 * @Note Cette fonction permet de calculer la valeur efficace du bruit du gyromètre selon une approche probabiliste, en calculant la moyenne d'un échantillon de données de vitesse angulaire
+	 * @param hi2cx Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier
+	 * @param noise Pointeur vers une zone mémoire de type double contenant l’information de valeur efficace du bruit
+	 * @retval None
+	 */
+void Noise_G(I2C_HandleTypeDef* hi2cx, double* noise){
 
 		double x_m;
 		double y_m;
@@ -357,6 +365,76 @@ void Noise_G(I2C_HandleTypeDef* hi2cx,double* noise){
 		noise[2] = sqrt(z_b);
 
 }
+
+
+
+/**
+ 	 * @brief Calibration du gyromètre
+ 	 * @Note Cette fonction permet de calculer l'offset des composantes de la vitesse angulaire en se basant sur la méthode du single point
+	 * @param hi2cx Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier
+	 * @param gyro_offset Pointeur vers une zone mémoire de type double contenant l’information de l'offset du gyromètre
+	 * @retval None
+	 */
+void Calib_gyro(I2C_HandleTypeDef* hi2cx,double* gyro_offset){
+
+	double wx_offset = 0;
+	double wy_offset = 0;
+	double wz_offset = 0;
+
+	double tableau_donnees_utiles[3];
+
+	int i = 0;
+
+	for(i=0;i<100;i++){
+		Measure_Vitesse_angulaire(hi2cx, tableau_donnees_utiles);
+		wx_offset += tableau_donnees_utiles[0]/100;
+		wy_offset += tableau_donnees_utiles[1]/100;
+		wz_offset += tableau_donnees_utiles[2]/100;
+	}
+
+
+	gyro_offset[0] = wx_offset;
+	gyro_offset[1] = wy_offset;
+	gyro_offset[2] = wz_offset;
+
+}
+
+
+/**
+ 	 * @brief Vérification du fonctionnement de la calibration
+ 	 * @Note Cette fonction permet de tester la fonction Cali_gyro en calculant la moyenne de la vitesse angulaire moins son offset lorsque le capteur est immobile
+	 * @param hi2cx Pointeur vers une structure I2C qui contient l'information de configuration pour un i2c particulier
+	 * @param tableau_moyenne Pointeur vers une zone mémoire de type double contenant l’information de valeur moyenne de la vitesse angulaire calibrée et capteur immobile (censée valoir 0)
+	 * @retval None
+	 */
+void Average(I2C_HandleTypeDef* hi2cx, double* tableau_moyenne){
+
+	double tableau_donnees_utiles[3] = {0};
+	double wx_moyen = 0;
+	double wy_moyen = 0;
+	double wz_moyen = 0;
+	int i = 0;
+	double gyro_offset[3]={0};
+
+	for (i=0;i<100;i++){ // i=100 car 100 données sur chaque axe
+
+		Measure_Vitesse_angulaire(hi2cx, tableau_donnees_utiles);
+		Calib_gyro(hi2cx, gyro_offset);
+
+		wx_moyen += (tableau_donnees_utiles[0]-gyro_offset[0])/100;
+		wy_moyen += (tableau_donnees_utiles[1]-gyro_offset[1])/100;
+		wz_moyen += (tableau_donnees_utiles[2]-gyro_offset[2])/100;
+	}
+
+	tableau_moyenne[0] = wx_moyen;
+	tableau_moyenne[1] = wy_moyen;
+	tableau_moyenne[2] = wz_moyen;
+
+}
+
+
+
+
 
 
 
