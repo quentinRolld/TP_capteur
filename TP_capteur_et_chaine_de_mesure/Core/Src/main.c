@@ -57,6 +57,7 @@ double norme_vecteur_Gyrometre =0;
 double donnees_mag[3]={0};
 double noise[3] = {0};
 double tableau_moyenne[3]={0};
+double donnees_B[300][3];
 
 /* USER CODE END PV */
 
@@ -240,6 +241,13 @@ int main(void)
 	  	  printf("valeur moyenne de wy calibré et immobile : wy = %.4f \r\n", tableau_moyenne[1]);
 	  	  printf("valeur moyenne de wz calibré et immobile : wz = %.4f \r\n ******* \r\n", tableau_moyenne[2]);
 
+	  	  for(i=0;i<300;i++){
+	  		Measure_M(&hi2c1, donnees_mag);
+	  		donnees_B[i][0] = donnees_mag[0];
+	  		donnees_B[i][1] = donnees_mag[1];
+	  		donnees_B[i][2] = donnees_mag[2];
+	  		HAL_Delay(50);
+	  	  }
 
   }
   /* USER CODE END 3 */
