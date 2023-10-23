@@ -8,6 +8,8 @@ Le code à été réalisé sur le logiciel STM32CubeIDE.
 
 *******
 
-This project aims to control an IMU-10DOF inertial power plant. The latter incorporates an accelerometer, a gyrometer, a magnetometer and also a pressure sensor but the latter is not used in this TP.
+The aim of this project is to control an IMU-10DOF inertial unit.
+The latter incorporates an accelerometer, a gyrometer, a magnetometer and a pressure sensor. 
+a pressure sensor, but the latter is not used in this project.
 
-The code was performed on the STM32CubeIDE software.
+The code was written using STM32CubeIDE software.
